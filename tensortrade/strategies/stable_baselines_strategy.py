@@ -34,20 +34,14 @@ from tensortrade.strategies import TradingStrategy
 class StableBaselinesTradingStrategy(TradingStrategy):
     """A trading strategy capable of self tuning, training, and evaluating with stable-baselines.
 
-    Parameters:
-    ----------
-    environments : `TradingEnvironment`
-        An instance of a trading environments for the agent to trade within.
-    model : BaseRLModel
-        The RL model to create the agent with.
-        Defaults to DQN.
-    policy : Union[str, BasePolicy]
-        The RL policy to train the agent's model with.
-        Defaults to 'MlpPolicy'.
-    model_kwargs : any
-        Any additional keyword arguments to adjust the model.
-    kwargs : dict
-        Optional keyword arguments to adjust the strategy.
+    Arguments:
+        environments: An instance of a trading environments for the agent to trade within.
+        model: The RL model to create the agent with.
+            Defaults to DQN.
+        policy: The RL policy to train the agent's model with.
+            Defaults to 'MlpPolicy'.
+        model_kwargs: Any additional keyword arguments to adjust the model.
+        kwargs: Optional keyword arguments to adjust the strategy.
     """
 
     def __init__(self,
@@ -115,7 +109,7 @@ class StableBaselinesTradingStrategy(TradingStrategy):
             performance = exchange_performance if len(exchange_performance) > 0 else performance
 
             if dones[0]:
-                if episode_callback is not None and episode_callback(self._environment._exchange.performance):
+                if episode_callback is not None and not episode_callback(performance):
                     break
 
                 episodes_completed += 1
