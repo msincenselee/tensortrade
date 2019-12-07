@@ -1,12 +1,13 @@
 from .trading_environment import TradingEnvironment
 
-# 环境字典
+from . import render
+
 _registry = {
     # 基本配置
     'basic': {
-        'exchange': 'simulated',        # 交易账号，模拟
-        'action_strategy': 'discrete',  # 交易策略： 离散
-        'reward_strategy': 'simple'     # 奖励策略： 简单
+        'exchange': 'simulated',     # 交易账号，模拟
+        'action_scheme': 'discrete', # 动作方案： 离散
+        'reward_scheme': 'simple'    # 奖励方案： 简单
     }
 }
 

@@ -31,9 +31,11 @@ class RandomUniformSlippageModel(SlippageModel):
             max_amount_slippage_percent: The maximum random slippage to be applied to the fill amount. Defaults to 0.
         """
         # 最大价格滑点百分比
-        self.max_price_slippage_percent = max_price_slippage_percent
+        self.max_price_slippage_percent = self.default('max_price_slippage_percent',
+                                                       max_price_slippage_percent)
         # 最大volume滑点百分比
-        self.max_amount_slippage_percent = max_amount_slippage_percent
+        self.max_amount_slippage_percent = self.default('max_amount_slippage_percent',
+                                                        max_amount_slippage_percent)
 
     def fill_order(self, trade: Trade, current_price: float) -> Trade:
         amount_slippage = np.random.uniform(0, self.max_amount_slippage_percent / 100)
@@ -60,4 +62,4 @@ class RandomUniformSlippageModel(SlippageModel):
                 fill_price = trade.price
                 fill_amount *= fill_price / trade.price
 
-        return Trade(trade.symbol, trade.trade_type, amount=fill_amount, price=fill_price)
+        return Trade(trade.step, trade.symbol, trade.trade_type, amount=fill_amount, price=fill_price)

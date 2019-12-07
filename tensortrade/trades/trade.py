@@ -16,17 +16,20 @@
 class Trade(object):
     """
     A trade object for use within trading environments.
-    Trade交易对象
+    交易对象
     """
 
-    def __init__(self, symbol: str, trade_type: 'TradeType', amount: float, price: float):
+    def __init__(self, step: int, symbol: str, trade_type: 'TradeType', amount: float, price: float):
         """
         Arguments:
+            step: The timestep the trade was made during the trading episode.
             symbol: The exchange symbol of the instrument in the trade (AAPL, ETH/USD, NQ1!, etc).
             trade_type: The type of trade executed (0 = HOLD, 1=LIMIT_BUY, 2=MARKET_BUY, 3=LIMIT_SELL, 4=MARKET_SELL).
             amount: The amount of the instrument in the trade (shares, satoshis, contracts, etc).
             price: The price paid per instrument in terms of the base instrument (e.g. 10000 represents $10,000.00 if the `base_instrument` is "USD").
         """
+        # 某一时间步骤
+        self._step = step
         # 合约
         self._symbol = symbol
         # 交易类型
@@ -37,11 +40,17 @@ class Trade(object):
         self._price = price
 
     def copy(self) -> 'Trade':
-        """
-        Return a copy of the current trade object.
-        复制当前交易对象
-        """
-        return Trade(symbol=self._symbol, trade_type=self._trade_type, amount=self._amount, price=self._price)
+        """Return a copy of the current trade object."""
+        return Trade(step=self._step, symbol=self._symbol, trade_type=self._trade_type, amount=self._amount, price=self._price)
+
+    @property
+    def step(self) -> str:
+        """The timestep the trade was made during the trading episode."""
+        return self._step
+
+    @step.setter
+    def step(self, step: str):
+        self._step = step
 
     @property
     def symbol(self) -> str:
@@ -71,8 +80,7 @@ class Trade(object):
 
     @property
     def amount(self) -> float:
-        """
-        The amount of the instrument in the trade (shares, satoshis, contracts, etc).
+        """The amount of the instrument in the trade (shares, satoshis, contracts, etc).
         交易数量，即volume
         """
         return self._amount
@@ -86,7 +94,7 @@ class Trade(object):
     def price(self) -> float:
         """
         The price paid per instrument in terms of the base instrument (e.g. 10000 represents $10,000.00 if the `base_instrument` is "USD").
-        基于基准合约的交易价格
+         基于基准合约的交易价格
         """
         return self._price
 

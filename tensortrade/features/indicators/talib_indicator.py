@@ -21,7 +21,8 @@ from copy import copy
 from abc import abstractmethod
 from typing import Union, List, Callable
 
-from tensortrade.features.feature_transformer import FeatureTransformer
+from tensortrade.features import FeatureTransformer
+
 
 class TAlibIndicator(FeatureTransformer):
     """
@@ -29,60 +30,45 @@ class TAlibIndicator(FeatureTransformer):
     添加一个或多个talib的指标，基于开/高/低/收字段
     """
 
-    def __init__(self, indicators: List[str], lows: Union[List[float], List[int]] = None, highs: Union[List[float], List[int]] = None):
+    def __init__(self, indicators: List[str], lows: Union[List[float], List[int]] = None, highs: Union[List[float], List[int]] = None, **kwargs):
         # 指标列表
-        self._indicator_names = indicators
-
+        self._indicator_names = [indicator[0].upper() for indicator in indicators]
+        # 指标函数参数列表
+        self._indicator_args = [indicator[1] for indicator in indicators]
         # 指标函数列表 str =》 talab.Method
-        self._indicators = list(
-            map(lambda indicator_name: self._str_to_indicator(indicator_name), indicators))
+        self._indicators = [getattr(talib, name) for name in self._indicator_names]
 
-        # 指标最低值列表
-        self._lows = lows or np.zeros(len(indicators))
-        # 指标最高值列表
-        self._highs = highs or np.ones(len(indicators))
-
-    def _str_to_indicator(self, indicator_name: str):
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """
-        根据指标名称，更换为Talib的方法属性
-        """
-        return getattr(talib, indicator_name.upper())
-
-    def transform_space(self, input_space: Space, column_names: List[str]) -> Space:
-        """
-        转换空间维度
-        :param input_space:
-        :param column_names:
-        :return:
-        """
-        # 复制输入空间 =》输出空间
-        output_space = copy(input_space)
-
-        shape_x, *shape_y = input_space.shape
-
-        # 添加指标到x维度
-        output_space.shape = (shape_x + len(self._indicators), *shape_y)
-
-        # 逐一指标执行，
-        for i in range(len(self._indicators)):
-            # 输出空间中，该指标的最小值初始化
-            output_space.low = np.append(output_space.low, self._lows[i])
-            # 输出空间中，该指标的最大值初始化
-            output_space.high = np.append(output_space.high, self._highs[i])
-
-        return output_space
-
-    def transform(self, X: pd.DataFrame, input_space: Space) -> pd.DataFrame:
-        """
-        输入pandas，输入空间，得出带有指标运算结果的输出空间
+        特征转换
         :param X:
-        :param input_space:
         :return:
         """
-        for i in range(len(self._indicators)):
-            indicator_name = self._indicator_names[i]
-            indicator = self._indicators[i]
+        # 逐一指标执行，
+        for idx, indicator in enumerate(self._indicators):
+            # 指标名称
+            indicator_name = self._indicator_names[idx]
+            # 指标参数
+            indicator_args = [X[arg].values for arg in self._indicator_args[indicator_name]]
 
-            X[indicator_name.upper()] = indicator(X['open'], X['high'], X['low'], X['close'])
+            # 特殊处理布林值（返回三个值）
+            if indicator_name == 'BBANDS':
+                upper, middle, lower = indicator(*indicator_args)
+
+                X["bb_upper"] = upper
+                X["bb_middle"] = middle
+                X["bb_lower"] = lower
+            else:
+                # 普通指标，只有一个返回值
+                try:
+                    value = indicator(*indicator_args)
+
+                    if type(value) == tuple:
+                        X[indicator_name] = value[0][0]
+                    else:
+                        X[indicator_name] = value
+
+                except:
+                    X[indicator_name] = indicator(*indicator_args)[0]
 
         return X

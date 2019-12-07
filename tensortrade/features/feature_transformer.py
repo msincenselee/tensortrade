@@ -13,20 +13,31 @@
 # limitations under the License.
 
 import pandas as pd
+import numpy as np
 
-from gym import Space
+from copy import copy
 from typing import List, Union
 from abc import ABCMeta, abstractmethod
 
+from tensortrade import Component
 
-class FeatureTransformer(object, metaclass=ABCMeta):
+
+class FeatureTransformer(Component, metaclass=ABCMeta):
     """
     An abstract feature transformer for use within feature pipelines.
-    抽象类，特征转换器，
+    特征转换器抽象类
     """
 
-    def __init__(self, *args, **kwargs):
-        pass
+    registered_name = "features"
+
+    def __init__(self, columns: Union[List[str], str, None] = None, inplace: bool = True, **kwargs):
+        """
+        Arguments:
+            columns (optional): A list of column names to normalize.
+            inplace (optional): If `False`, a new column will be added to the output for each input column.
+        """
+        self.columns = self.default('columns', columns)
+        self._inplace = self.default('inplace', inplace)
 
     @property
     def columns(self) -> List[str]:
@@ -50,22 +61,7 @@ class FeatureTransformer(object, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def transform_space(self, input_space: Space, column_names: List[str]) -> Space:
-        """Get the transformed output space for a given input space.
-        抽象方法，需要实现：根据输入空间维度和指定的数据项列表，返回输出空间维度
-        Args:
-            input_space: A `gym.Space` matching the shape of the pipeline's input.
-                         符合 gym.Space 规则的输入空间维度
-            column_names: A list of all column names in the input data frame.
-
-        Returns:
-            A `gym.Space` matching the shape of the pipeline's output.
-            符合gym.space规则的输出空间维度
-        """
-        raise NotImplementedError
-
-    @abstractmethod
-    def transform(self, X: pd.DataFrame, input_space: Space) -> pd.DataFrame:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """Transform the data set and return a new data frame.
         抽象方法，需要实现：根据数据和观测空间维度，转换为输出空间
         Arguments:

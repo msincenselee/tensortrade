@@ -25,88 +25,66 @@ from tensortrade.features.feature_transformer import FeatureTransformer
 class MinMaxNormalizer(FeatureTransformer):
     """
     A transformer for normalizing values within a feature pipeline by the column-wise extrema.
-    按照最小/最大值进行数据常态化的特征转换器
+    特征转换器，按照最小/最大值进行数据常态化
     根据指定的columns列表，给出的最大最小值范围。
     """
 
     def __init__(self,
                  columns: Union[List[str], str, None] = None,
-                 feature_min=0,
-                 feature_max=1,
-                 inplace=True):
+                 input_min: float = -1E-8,
+                 input_max: float = 1E8,
+                 feature_min: float = 0,
+                 feature_max: float = 1,
+                 inplace: bool = True):
         """
         Arguments:
             columns (optional): A list of column names to normalize.
-            feature_min (optional): The minimum value in the range to scale to.
-            feature_max (optional): The maximum value in the range to scale to.
+            input_min (optional): The minimum `float` in the range to scale to. Defaults to -1E-8.
+            input_max (optional): The maximum `float` in the range to scale to. Defaults to 1E8.
+            feature_min (optional): The minimum `float` in the range to scale to. Defaults to 0.
+            feature_max (optional): The maximum `float` in the range to scale to. Defaults to 1.
             inplace (optional): If `False`, a new column will be added to the output for each input column.
         """
+        super().__init__(columns=columns, inplace=inplace)
+        # 输入的最小值
+        self._input_min = input_min
+        # 输入的最大值
+        self._input_max = input_max
         # 特征值最小值
         self._feature_min = feature_min
         # 特征值最大值
         self._feature_max = feature_max
-        # 内部更换
-        self._inplace = inplace
-        # 需要进行转换的指端
-        self.columns = columns
 
-    def transform_space(self, input_space: Space, column_names: List[str]) -> Space:
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
         """
-        转换空间
-        :param input_space:  输入空间
-        :param column_names: 指定的字段列表
-        :return:
-        """
-        # 如果已存在输入空间，直接返回
-        if self._inplace:
-            return input_space
-
-        # 复制
-        output_space = copy(input_space)
-        # 获取 x，y 维度大小
-        shape_x, *shape_y = input_space.shape
-        # 当前字段列表
-        columns = self.columns or range(len(shape_x))
-        # 输出空间的share，扩展了字段数量
-        output_space.shape = (shape_x + len(columns), *shape_y)
-
-        for _ in columns:
-            # 填充缺省最小值
-            output_space.low = np.append(output_space.low, self._feature_min)
-            # 填充缺省最高值
-            output_space.high = np.append(output_space.high, self._feature_max)
-
-        return output_space
-
-    def transform(self, X: pd.DataFrame, input_space: Space) -> pd.DataFrame:
-        """
-        特征转换
-        :param X:
-        :param input_space:
-        :return:
+         特征转换
+        :param X: 输入矩阵
+        :return: 输出矩阵
         """
         # 如果当前columns为空，使用输入的df的columns替代
         if self.columns is None:
-            self.columns = list(X.columns)
+            self.columns = list(X.select_dtypes('number').columns)
 
-        for idx, column in enumerate(self.columns):
-            # 指标的最大值
-            low = input_space.low[idx]
-            # 指标的最大值
-            high = input_space.high[idx]
-
+        for column in self.columns:
+            # 约束了最低值，最高值
+            low, high = self._input_min, self._input_max
             # 指标范围
             scale = (self._feature_max - self._feature_min) + self._feature_min
 
-            # 对指标进行指标化计算
-            normalized_column = (X[column] - low) / (high - low + 1E-9) * scale
-
-            if self._inplace:
-                # 直接更新指标字段常态化的值
-                X[column] = normalized_column
+            if high - low == 0:
+                # 最高和最低一致：一条直线
+                normalized_column = (1/len(X[column])) * scale
             else:
+                # 对指标进行指标化计算
+                normalized_column = (X[column] - low) / (high - low) * scale
+
+            if not self._inplace:
                 # 另起新的名称保存常态化之后的值
-                column_name = '{}_minmax_{}_{}'.format(column, self._feature_min, self._feature_max)
-                X[column_name] = normalized_column
+                column = '{}_minmax_{}_{}'.format(column, self._feature_min, self._feature_max)
+
+            args = {}
+            args[column] = normalized_column
+
+            X = X.assign(**args)
 
         return X
