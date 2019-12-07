@@ -50,9 +50,6 @@ class FractionalDifference(FeatureTransformer):
         # 阶差基准
         self._difference_threshold = difference_threshold
 
-        # 替换更新
-        self._inplace = inplace
-
         self.reset()
 
     def reset(self):

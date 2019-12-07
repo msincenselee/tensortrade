@@ -91,7 +91,6 @@ class ContinuousActions(ActionScheme):
             # 交易合约当前持仓数量
             amount_held = self._exchange.portfolio.get(self._instrument, 0)
             # 持仓数量 * 仓位比例 => 修正 =》 卖出交易合约数量
-
             amount = round(amount_held * trade_amount_percent, instrument_precision)
 
         # 交易合约，交易类型，交易数量，交易价格 =》 Trade 对象

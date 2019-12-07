@@ -29,6 +29,8 @@ class SimpleMovingAverage(FeatureTransformer):
         """
         Arguments:
             columns (optional): A list of column names to normalize.
+            window_size (optional): The length of the moving average window. Defaults to 20.
+            inplace (optional): If `False`, a new column will be added to the output for each input column.
         """
         super().__init__(columns=columns, inplace=inplace)
 
