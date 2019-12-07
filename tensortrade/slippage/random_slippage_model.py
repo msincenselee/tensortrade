@@ -19,7 +19,10 @@ from tensortrade.trades import Trade, TradeType
 
 
 class RandomUniformSlippageModel(SlippageModel):
-    """A uniform random slippage model."""
+    """
+    A uniform random slippage model.
+    随机滑点模型
+    """
 
     def __init__(self, max_price_slippage_percent: float = 3.0, max_amount_slippage_percent: float = 0.0):
         """
@@ -27,7 +30,9 @@ class RandomUniformSlippageModel(SlippageModel):
             max_price_slippage_percent: The maximum random slippage to be applied to the fill price. Defaults to 3.0 (i.e. 3%).
             max_amount_slippage_percent: The maximum random slippage to be applied to the fill amount. Defaults to 0.
         """
+        # 最大价格滑点百分比
         self.max_price_slippage_percent = max_price_slippage_percent
+        # 最大volume滑点百分比
         self.max_amount_slippage_percent = max_amount_slippage_percent
 
     def fill_order(self, trade: Trade, current_price: float) -> Trade:

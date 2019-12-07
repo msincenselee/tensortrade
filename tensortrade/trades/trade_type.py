@@ -18,11 +18,11 @@ from enum import Enum
 class TradeType(Enum):
     """A trade type for use within trading environments."""
 
-    HOLD = 0
-    LIMIT_BUY = 1
-    MARKET_BUY = 2
-    LIMIT_SELL = 3
-    MARKET_SELL = 4
+    HOLD = 0            # 持有
+    LIMIT_BUY = 1       # 限价买入
+    MARKET_BUY = 2      # 市场价买入
+    LIMIT_SELL = 3      # 限价卖出
+    MARKET_SELL = 4     # 市场价卖出
 
     @property
     def is_hold(self) -> bool:

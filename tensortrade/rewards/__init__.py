@@ -2,6 +2,7 @@ from .reward_strategy import RewardStrategy
 from .simple_profit_strategy import SimpleProfitStrategy
 from .risk_adjusted_return_strategy import RiskAdjustedReturnStrategy
 
+# 奖赏策略字典
 _registry = {
     'simple': SimpleProfitStrategy(),
     'risk-adjusted': RiskAdjustedReturnStrategy()

@@ -18,7 +18,10 @@ from tensortrade.trades import Trade
 
 
 class SlippageModel(object, metaclass=ABCMeta):
-    """A model for simulating slippage on an exchange trade."""
+    """
+    A model for simulating slippage on an exchange trade.
+    抽象类，模拟交易行为的滑点模型
+    """
 
     def __init__(self):
         pass

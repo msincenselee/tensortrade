@@ -8,7 +8,7 @@ from .instrument_exchange import InstrumentExchange
 from . import live
 from . import simulated
 
-
+# 交易账号字典
 _registry = {
     'simulated': simulated.SimulatedExchange,
     'fbm': simulated.FBMExchange,
@@ -18,7 +18,7 @@ _registry = {
 
 def get(identifier: str) -> InstrumentExchange:
     """Gets the `InstrumentExchange` that matches with the identifier.
-
+    根据标识符获取交易账号实例
     As a caution, when exchanges that require a data frame are instantiated by
     this function, the data frame is set as None and must be set at a later
     point in time for the exchange to work.

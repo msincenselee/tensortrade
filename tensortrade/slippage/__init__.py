@@ -1,7 +1,7 @@
 from .slippage_model import SlippageModel
 from .random_slippage_model import RandomUniformSlippageModel
 
-
+# 滑点模型字典
 _registry = {
     'uniform': RandomUniformSlippageModel()
 }

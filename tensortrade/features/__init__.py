@@ -5,7 +5,7 @@ from . import indicators
 from . import scalers
 from . import stationarity
 
-
+# 特征库字典
 _registry = {}
 
 

@@ -20,12 +20,15 @@ from gym.spaces import Space
 
 from tensortrade.trades import Trade
 
-DTypeString = Union[type, str]
-TradeActionUnion = Union[int, float, tuple]
+DTypeString = Union[type, str]               # 交易类型 type 或 str
+TradeActionUnion = Union[int, float, tuple]  # 交易动作类型 int 或 float 或 tuple
 
 
 class ActionStrategy(object, metaclass=ABCMeta):
-    """An abstract strategy for determining the action to take at each timestep within a trading environment."""
+    """
+    An abstract strategy for determining the action to take at each timestep within a trading environment.
+
+    """
 
     @abstractmethod
     def __init__(self, action_space: Space, dtype: DTypeString = np.float16):
@@ -40,11 +43,18 @@ class ActionStrategy(object, metaclass=ABCMeta):
 
     @property
     def action_space(self) -> Space:
-        """The shape of the actions produced by the strategy."""
+        """
+        The shape of the actions produced by the strategy.
+        策略的动作产生的维度空间
+        """
         return self._action_space
 
     @action_space.setter
     def action_space(self, action_space: Space):
+        """
+        set action space
+        设置动作策略的维度空间
+        """
         self._action_space = action_space
 
     @property

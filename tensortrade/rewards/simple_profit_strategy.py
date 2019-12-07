@@ -20,24 +20,37 @@ from tensortrade.trades import TradeType, Trade
 
 
 class SimpleProfitStrategy(RewardStrategy):
-    """A reward strategy that rewards the agent for profitable trades and prioritizes trading over not trading.
-
+    """
+    A reward strategy that rewards the agent for profitable trades and prioritizes trading over not trading.
+    简单的收益策略，用于服务智能体，提供交易收益计算
     This strategy supports simple action strategies that trade a single position in a single instrument at a time.
     """
 
     def reset(self):
-        """Necessary to reset the last purchase price and state of open positions."""
+        """
+        Necessary to reset the last purchase price and state of open positions.
+        重置，委托价格为-1， 当前不持有合约
+        """
         self._purchase_price = -1
         self._is_holding_instrument = False
 
     def get_reward(self, current_step: int, trade: Trade) -> float:
-        """Reward -1 for not holding a position, 1 for holding a position, 2 for opening a position, and 1 + 5^(log_10(profit)) for closing a position.
-
+        """
+        Reward -1 for not holding a position, 1 for holding a position, 2 for opening a position,
+        and 1 + 5^(log_10(profit)) for closing a position.
+        计算获取奖赏，
+        -1 ：没有持仓
+        1： 持仓
+        2： 开仓
+        1+5^(log_10(profit)： 平仓,当交易很多时，会减缓收益的增长
         The 5^(log_10(profit)) function simply slows the growth of the reward as trades get large.
         """
         if trade.is_hold and self._is_holding_instrument:
+            # 持仓，返回1
             return 1
+
         elif trade.is_buy and trade.amount > 0:
+
             self._purchase_price = trade.price
             self._is_holding_instrument = True
 

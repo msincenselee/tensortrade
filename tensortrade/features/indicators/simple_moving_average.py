@@ -21,12 +21,15 @@ from tensortrade.features.feature_transformer import FeatureTransformer
 
 
 class SimpleMovingAverage(FeatureTransformer):
-    """A transformer to get the simple moving average of one or more columns in a data frame."""
+    """
+    A transformer to get the simple moving average of one or more columns in a data frame.
+
+    """
 
     def __init__(self, columns: Union[List[str], str, None] = None):
         """
         Arguments:
-            columns (optional): A list of column names to normalize.
+            columns (optional): A list of column names to normalize. 需要标准化的特征名称列表
         """
         self.columns = columns
 

@@ -20,19 +20,25 @@ from typing import Union, List
 
 
 class TradingStrategy(object, metaclass=ABCMeta):
-    """An abstract trading strategy capable of self tuning, training, and evaluating."""
+    """
+    An abstract trading strategy capable of self tuning, training, and evaluating.
+    抽象的交易策略，包含了调优，训练，评估
+    """
 
     @abstractmethod
     def __init__(self, environment: 'TradingEnvironment'):
         """
         Arguments:
-            environment: A `TradingEnvironment` instance for the agent to trade within.
+            environment: A `TradingEnvironment` instance for the agent to trade within. 交易环境
         """
         self._environment = environment
 
     @property
     def environment(self) -> 'TradingEnvironment':
-        """A `TradingEnvironment` instance for the agent to trade within."""
+        """
+        A `TradingEnvironment` instance for the agent to trade within.
+        交易环境，供智能体Agent使用
+        """
         return self._environment
 
     @environment.setter

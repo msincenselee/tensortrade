@@ -1,11 +1,12 @@
 from .trading_environment import TradingEnvironment
 
-
+# 环境字典
 _registry = {
+    # 基本配置
     'basic': {
-        'exchange': 'simulated',
-        'action_strategy': 'discrete',
-        'reward_strategy': 'simple'
+        'exchange': 'simulated',        # 交易账号，模拟
+        'action_strategy': 'discrete',  # 交易策略： 离散
+        'reward_strategy': 'simple'     # 奖励策略： 简单
     }
 }
 
