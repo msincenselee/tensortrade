@@ -34,22 +34,19 @@ class StandardNormalizer(FeatureTransformer):
             inplace (optional): If `False`, a new column will be added to the output for each input column.
         """
         super().__init__(columns=columns, inplace=inplace)
-        # 特征最小值
+
         self._feature_min = feature_min
-        # 特征最大值
         self._feature_max = feature_max
-        # 历史数据
+
+        if feature_min >= feature_max:
+            raise ValueError("feature_min must be less than feature_max")
+
         self._history = {}
 
     def reset(self):
         self._history = {}
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """
-        特征转换
-        :param X:
-        :return:
-        """
         if self.columns is None:
             self.columns = list(X.select_dtypes('number').columns)
 
